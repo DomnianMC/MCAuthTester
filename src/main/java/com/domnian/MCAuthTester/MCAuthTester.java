@@ -7,6 +7,7 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
@@ -15,9 +16,16 @@ public class MCAuthTester {
 	static String aToken = null;
 	static String cToken = null;
 	static String authResponse;
+	static String signout;
 	static JsonParser parser = new JsonParser();
+	static String cUUID = null;
 
 	public static void main(String[] args) {
+		doAuthenticate(args);
+		doServerJoin();
+	}
+
+	public static void doAuthenticate(String[] args) {
 		try {
 			authResponse = post("authenticate", genAuthPayload(args[0], args[1], cToken).toString());
 		} catch (Exception e) {
@@ -27,8 +35,24 @@ public class MCAuthTester {
 		JsonObject authJson = (JsonObject)parser.parse(authResponse);
 		aToken = authJson.get("accessToken").getAsString();
 		cToken = authJson.get("clientToken").getAsString();
-		System.out.println("accessToken: " + (aToken != null ? aToken : "FAILED"));
-		System.out.println("clientToken: " + (aToken != null ? cToken : "FAILED"));
+		JsonArray aProfiles = (JsonArray) authJson.get("availableProfiles");
+		JsonObject sProfile = (JsonObject) authJson.get("selectedProfile");
+		System.out.println("Access Token: " + (aToken != null ? aToken : "FAILED"));
+		System.out.println("Client Token: " + (aToken != null ? cToken : "FAILED"));
+		System.out.println("Available Profiles:");
+		for ( int i = 0; i < aProfiles.size(); i++ ) {
+			JsonObject profile = (JsonObject) aProfiles.get(i);
+			String id = profile.get("id").getAsString();
+			String name = profile.get("name").getAsString();
+			System.out.println(" - " + id + "/" + name);
+		}
+		String id = sProfile.get("id").getAsString();
+		String name = sProfile.get("name").getAsString();
+		System.out.println("Selected Profile: " + id + "/" + name);
+	}
+	
+	public static void doServerJoin() {
+		System.out.println("Server Join Not Yet Implemented: Researching How To Send Handshake Packets");
 	}
 
 	public static String post(String method, String payload) throws Exception {
@@ -58,13 +82,16 @@ public class MCAuthTester {
 
 	public static JsonObject genAuthPayload(String username, String password,
 			String cid) {
-		JsonObject reqparam = new JsonObject();
-		reqparam.addProperty("username", username);
-		reqparam.addProperty("password", password);
+		JsonObject req = new JsonObject();
+		JsonObject agent = new JsonObject();
+		agent.addProperty("name", "Minecraft");
+		req.add("agent", agent);
+		req.addProperty("username", username);
+		req.addProperty("password", password);
 		if (cid != null) {
-			reqparam.addProperty("clientToken", cid);
+			req.addProperty("clientToken", cid);
 		}
-		return reqparam;
+		return req;
 	}
 
 }
