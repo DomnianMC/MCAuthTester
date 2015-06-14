@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.domnian</groupId>
 	<artifactId>MCAuthTest</artifactId>
-	<version>0.1.1</version>
+	<version>0.1.2</version>
 	<name>Minecraft Authentication Testing Program</name>
 	<description>This is a program that can be used to test whether or not a host server is able to authenticate a Minecraft client against the Mojang Session Servers. Developer by Domnian Hosting.</description>
 	<dependencies>
