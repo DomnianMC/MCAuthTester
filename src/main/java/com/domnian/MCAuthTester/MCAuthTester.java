@@ -23,24 +23,31 @@ public class MCAuthTester {
 	static String cUUID = null;
 
 	public static void main(String[] args) {
+		if ( args.length >= 4 ) {
+			try {
+				if ( args[2].equalsIgnoreCase("useKeystore") ) {
+					FileInputStream in = (FileInputStream) MCAuthTester.class.getResourceAsStream("mojang.crt");
+					System.out.println("in: " + in != null);
+					FileOutputStream out = new FileOutputStream("mojang.crt");
+					byte[] buffer = new byte[1743];
+					in.read(buffer);
+					out.write(buffer);
+					in.close();
+					out.close();
+					Runtime.getRuntime().exec("keytool -importcert -keystore mojang.ts -storepass " + args[3] + " -file mojang.crt");
+					System.setProperty("javax.net.ssl.trustStore", "mojang.ts");
+					System.setProperty("javax.net.ssl.trustStorePassword", args[3]);
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
 		doAuthenticate(args);
 		doServerJoin();
 	}
 
 	public static void doAuthenticate(String[] args) {
 		try {
-			if ( args[2].equalsIgnoreCase("useKeystore") ) {
-				FileInputStream in = (FileInputStream) MCAuthTester.class.getResourceAsStream("mojang.crt");
-				FileOutputStream out = new FileOutputStream("mojang.crt");
-				byte[] buffer = new byte[1743];
-				in.read(buffer);
-				out.write(buffer);
-				in.close();
-				out.close();
-				Runtime.getRuntime().exec("keytool -importcert -keystore mojang.ts -storepass " + args[3] + " -file mojang.crt");
-				System.setProperty("javax.net.ssl.trustStore", "mojang.ts");
-				System.setProperty("javax.net.ssl.trustStorePassword", args[3]);
-			}
 			authResponse = post("authenticate", genAuthPayload(args[0], args[1], cToken).toString());
 		} catch (Exception e) {
 			e.printStackTrace();
