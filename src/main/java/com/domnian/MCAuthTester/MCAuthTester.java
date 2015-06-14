@@ -29,9 +29,9 @@ public class MCAuthTester {
 		try {
 			authResponse = post("authenticate", genAuthPayload(args[0], args[1], cToken).toString());
 		} catch (Exception e) {
-			//Fail Silently (Most Likely HTTP 403 Forbidden)
+			e.printStackTrace();
 		}
-		System.out.println("Authentication Response: " + (authResponse.equalsIgnoreCase("null") ? "FAILED" : authResponse));
+		System.out.println("Authentication Response: " + ((authResponse.equalsIgnoreCase("null") || authResponse == null) ? "FAILED" : authResponse));
 		JsonObject authJson = (JsonObject)parser.parse(authResponse);
 		aToken = authJson.get("accessToken").getAsString();
 		cToken = authJson.get("clientToken").getAsString();
