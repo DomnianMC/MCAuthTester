@@ -26,15 +26,19 @@ public class MCAuthTester {
 		if ( args.length >= 4 ) {
 			try {
 				if ( args[2].equalsIgnoreCase("useKeystore") ) {
-					FileInputStream in = (FileInputStream) MCAuthTester.class.getResourceAsStream("mojang.crt");
-					System.out.println("in: " + in != null);
-					FileOutputStream out = new FileOutputStream("mojang.crt");
-					byte[] buffer = new byte[1743];
-					in.read(buffer);
-					out.write(buffer);
-					in.close();
-					out.close();
-					Runtime.getRuntime().exec("keytool -importcert -keystore mojang.ts -storepass " + args[3] + " -file mojang.crt");
+					if ( args.length >= 5 ) {
+						if ( args[4].equalsIgnoreCase("store") ) {
+							FileInputStream in = (FileInputStream) MCAuthTester.class.getResourceAsStream("mojang.crt");
+							System.out.println("in: " + in != null);
+							FileOutputStream out = new FileOutputStream("mojang.crt");
+							byte[] buffer = new byte[1743];
+							in.read(buffer);
+							out.write(buffer);
+							in.close();
+							out.close();
+							Runtime.getRuntime().exec("keytool -importcert -keystore mojang.ts -storepass " + args[3] + " -file mojang.crt");
+						}
+					}
 					System.setProperty("javax.net.ssl.trustStore", "mojang.ts");
 					System.setProperty("javax.net.ssl.trustStorePassword", args[3]);
 				}
